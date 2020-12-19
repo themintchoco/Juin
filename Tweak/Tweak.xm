@@ -320,7 +320,7 @@ MediaControlsTimeControl* timeSlider;
 
 	SBUILegibilityLabel* label = MSHookIvar<SBUILegibilityLabel *>(self, "_callToActionLabel");
 
-	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+	if (![juinView isHidden] || !([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
 		[label setHidden:NO];
 		return;
 	}
@@ -337,7 +337,7 @@ MediaControlsTimeControl* timeSlider;
 
 	%orig;
 
-	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+	if (![juinView isHidden] || !([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
 		[self setHidden:NO];
 		return;
 	}
@@ -350,7 +350,7 @@ MediaControlsTimeControl* timeSlider;
 
 	%orig;
 
-	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+	if (![juinView isHidden] || !([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
 		[self setHidden:NO];
 		return;
 	}
