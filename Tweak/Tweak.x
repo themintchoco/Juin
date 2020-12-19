@@ -128,6 +128,7 @@ MediaControlsTimeControl* timeSlider;
     [skipButton.centerXAnchor constraintEqualToAnchor:playPauseButton.rightAnchor constant:60].active = YES;
     [skipButton.centerYAnchor constraintEqualToAnchor:sourceButton.topAnchor constant:-50].active = YES;
 
+
 	// artist label
 	artistLabel = [[UILabel alloc] init];
 	[artistLabel setText:@"Far Places"];
@@ -143,6 +144,7 @@ MediaControlsTimeControl* timeSlider;
     if (![artistLabel isDescendantOfView:juinView]) [juinView addSubview:artistLabel];
     [artistLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [artistLabel.centerYAnchor constraintEqualToAnchor:playPauseButton.topAnchor constant:-60].active = YES;
+
 
 	// song label
 	songLabel = [[UILabel alloc] init];
@@ -161,6 +163,7 @@ MediaControlsTimeControl* timeSlider;
     [songLabel.centerYAnchor constraintEqualToAnchor:artistLabel.topAnchor constant:-24].active = YES;
 
 	
+	// tap gesture
 	UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
 	[tap setNumberOfTapsRequired:1];
 	[tap setNumberOfTouchesRequired:1];
@@ -212,13 +215,13 @@ MediaControlsTimeControl* timeSlider;
 - (void)hideJuinView {
 
 	if (![juinView isHidden]) {
-		[UIView transitionWithView:juinView duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+		[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 			[juinView setHidden:YES];
 		} completion:^(BOOL finished) {
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
 		}];
 	} else {
-		[UIView transitionWithView:juinView duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+		[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 			[juinView setHidden:NO];
 		} completion:^(BOOL finished) {
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
@@ -258,117 +261,117 @@ MediaControlsTimeControl* timeSlider;
 
 %end
 
-%group JuinHiding
+// %group JuinHiding
 
-%hook CSQuickActionsButton
+// %hook CSQuickActionsButton
 
-- (id)initWithFrame:(CGRect)frame { // add notification observer
+// - (id)initWithFrame:(CGRect)frame { // add notification observer
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
+//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
+// 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
 
-	return %orig;
+// 	return %orig;
 
-}
+// }
 
-%new
-- (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide quick action buttons
+// // %new
+// - (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide quick action buttons
 
-	if ([notification.name isEqual:@"juinHideElements"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[self setAlpha:0.0];
-		} completion:nil];
-	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[self setAlpha:1.0];
-		} completion:nil];
-	}
+// 	if ([notification.name isEqual:@"juinHideElements"]) {
+// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+// 			[self setAlpha:0.0];
+// 		} completion:nil];
+// 	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
+// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+// 			[self setAlpha:1.0];
+// 		} completion:nil];
+// 	}
 
-}
+// }
 
-- (void)dealloc { // remove observer
+// - (void)dealloc { // remove observer
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+// 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     
-	%orig;
+// 	%orig;
 
-}
+// }
 
-%end
+// %end
 
-%hook CSHomeAffordanceView
+// %hook CSHomeAffordanceView
 
-- (id)initWithFrame:(CGRect)frame { // add notification observer
+// - (id)initWithFrame:(CGRect)frame { // add notification observer
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
+//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
+// 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
 
-	return %orig;
+// 	return %orig;
 
-}
+// }
 
-%new
-- (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide homebar
+// %new
+// - (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide homebar
 
-	if ([notification.name isEqual:@"juinHideElements"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[self setAlpha:0.0];
-		} completion:nil];
-	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[self setAlpha:1.0];
-		} completion:nil];
-	}
+// 	if ([notification.name isEqual:@"juinHideElements"]) {
+// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+// 			[self setAlpha:0.0];
+// 		} completion:nil];
+// 	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
+// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+// 			[self setAlpha:1.0];
+// 		} completion:nil];
+// 	}
 
-}
+// }
 
-- (void)dealloc { // remove observer
+// - (void)dealloc { // remove observer
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+// 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     
-	%orig;
+// 	%orig;
 
-}
+// }
 
-%end
+// %end
 
-%hook CSPageControl
+// %hook CSPageControl
 
-- (id)initWithFrame:(CGRect)frame { // add notification observer
+// - (id)initWithFrame:(CGRect)frame { // add notification observer
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
+//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
+// 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
 
-	return %orig;
+// 	return %orig;
 
-}
+// }
 
-%new
-- (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide page dots
+// %new
+// - (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide page dots
 
-	if ([notification.name isEqual:@"juinHideElements"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[self setAlpha:0.0];
-		} completion:nil];
-	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[self setAlpha:1.0];
-		} completion:nil];
-	}
+// 	if ([notification.name isEqual:@"juinHideElements"]) {
+// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+// 			[self setAlpha:0.0];
+// 		} completion:nil];
+// 	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
+// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+// 			[self setAlpha:1.0];
+// 		} completion:nil];
+// 	}
 
-}
+// }
 
-- (void)dealloc { // remove observer
+// - (void)dealloc { // remove observer
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+// 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     
-	%orig;
+// 	%orig;
 
-}
+// }
 
-%end
+// %end
 
-%end
+// %end
 
 %group JuinData
 
@@ -451,6 +454,6 @@ MediaControlsTimeControl* timeSlider;
 
 	%init(Juin);
 	%init(JuinData);
-	%init(JuinHiding);
+	// %init(JuinHiding);
 
 }
