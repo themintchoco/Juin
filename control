@@ -1,0 +1,9 @@
+Package: love.litten.juin
+Name: Juin
+Version: 1.0
+Depends: mobilesubstrate
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: alexandra
+Author: alexandra
+Section: Tweaks
