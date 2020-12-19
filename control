@@ -1,7 +1,7 @@
 Package: love.litten.juin
 Name: Juin
 Version: 1.0
-Depends: mobilesubstrate
+Depends: mobilesubstrate, firmware (>= 13)
 Architecture: iphoneos-arm
 Description: Spotify inspired lockscreen player
 Maintainer: alexandra

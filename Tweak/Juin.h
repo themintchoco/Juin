@@ -2,7 +2,7 @@
 #import <Foundation/Foundation.h>
 #import <MediaRemote/MediaRemote.h>
 #import <CoreText/CoreText.h>
-#import <AudioToolbox/AudioServices.h>
+#import "MarqueeLabel.h"
 
 UIImageView* backgroundArtwork;
 UIImage* currentArtwork;
@@ -45,18 +45,21 @@ BOOL firstTimeLoaded = NO;
 - (void)receiveFadeNotification:(NSNotification *)notification;
 @end
 
-@interface CSHomeAffordanceView : UIView
+@interface CSPageControl : UIPageControl
 - (void)receiveFadeNotification:(NSNotification *)notification;
 @end
 
-@interface CSPageControl : UIPageControl
-- (void)receiveFadeNotification:(NSNotification *)notification;
+@interface SBUILegibilityLabel : UILabel
+@end
+
+@interface SBUICallToActionLabel : UILabel
 @end
 
 @interface SBMediaController : NSObject
 + (id)sharedInstance;
 - (void)setNowPlayingInfo:(id)arg1;
 - (BOOL)isPlaying;
+- (BOOL)isPaused;
 - (BOOL)changeTrack:(int)arg1 eventSource:(long long)arg2;
 - (BOOL)togglePlayPauseForEventSource:(long long)arg1;
 @end

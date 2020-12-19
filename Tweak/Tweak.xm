@@ -75,7 +75,7 @@ MediaControlsTimeControl* timeSlider;
 	[[sourceButton titleLabel] setFont:[UIFont fontWithName:@"CircularSpUI-Book" size:10]];
 	[sourceButton setTintColor:[UIColor colorWithRed: 0.11 green: 0.73 blue: 0.33 alpha: 1.00]];
 	[sourceButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
-	[sourceButton setTitle:[[NSString stringWithFormat:@"Aurora"] uppercaseString] forState:UIControlStateNormal];
+	[sourceButton setTitle:[NSString stringWithFormat:@"%@", [[UIDevice currentDevice] name]] forState:UIControlStateNormal];
 	// [sourceButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/listeningOnAnotherDevice.png"] forState:UIControlStateNormal];
 	[sourceButton setHidden:YES];
 
@@ -135,7 +135,6 @@ MediaControlsTimeControl* timeSlider;
 	[artistLabel setTextColor:[UIColor colorWithRed: 0.60 green: 0.60 blue: 0.60 alpha: 1.00]];
 	[artistLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:22]];
 	[artistLabel setTextAlignment:NSTextAlignmentCenter];
-	[artistLabel setNumberOfLines:2];
 	[artistLabel setHidden:YES];
 
 	[artistLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -147,17 +146,16 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// song label
-	songLabel = [[UILabel alloc] init];
+	songLabel = [[MarqueeLabel alloc] init];
 	[songLabel setText:@"In My Head"];
 	[songLabel setTextColor:[UIColor whiteColor]];
 	[songLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:36]];
 	[songLabel setTextAlignment:NSTextAlignmentCenter];
-	[songLabel setNumberOfLines:3];
 	[songLabel setHidden:YES];
 
 	[songLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [songLabel.widthAnchor constraintEqualToConstant:279].active = YES;
-    [songLabel.heightAnchor constraintEqualToConstant:160].active = YES;
+    [songLabel.heightAnchor constraintEqualToConstant:51].active = YES;
     if (![songLabel isDescendantOfView:juinView]) [juinView addSubview:songLabel];
     [songLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [songLabel.centerYAnchor constraintEqualToAnchor:artistLabel.topAnchor constant:-24].active = YES;
@@ -168,7 +166,7 @@ MediaControlsTimeControl* timeSlider;
 	[tap setNumberOfTapsRequired:1];
 	[tap setNumberOfTouchesRequired:1];
 
-	[self addGestureRecognizer:tap];
+	[juinView addGestureRecognizer:tap];
 
 }
 
@@ -212,21 +210,36 @@ MediaControlsTimeControl* timeSlider;
 }
 
 %new
-- (void)hideJuinView {
+- (void)hideJuinView { // hide or unhide juin
 
 	if (![juinView isHidden]) {
 		[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 			[juinView setHidden:YES];
-		} completion:^(BOOL finished) {
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
-		}];
+		} completion:nil];
 	} else {
 		[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 			[juinView setHidden:NO];
-		} completion:^(BOOL finished) {
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
-		}];
+		} completion:nil];
 	}
+
+}
+
+%end
+
+%hook NCNotificationListView
+
+- (void)touchesBegan:(id)arg1 withEvent:(id)arg2 { // unhide juin on tap
+
+	%orig;
+
+	if (![juinView isHidden]) return;
+
+	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+		[juinView setHidden:NO];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
+	} completion:nil];
 
 }
 
@@ -261,117 +274,94 @@ MediaControlsTimeControl* timeSlider;
 
 %end
 
-// %group JuinHiding
+%group JuinHiding
 
-// %hook CSQuickActionsButton
+%hook CSQuickActionsButton
 
-// - (id)initWithFrame:(CGRect)frame { // add notification observer
+- (id)initWithFrame:(CGRect)frame { // add notification observer
 
-//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
-// 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
 
-// 	return %orig;
+	return %orig;
 
-// }
+}
 
-// // %new
-// - (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide quick action buttons
+%new
+- (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide quick action buttons
 
-// 	if ([notification.name isEqual:@"juinHideElements"]) {
-// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-// 			[self setAlpha:0.0];
-// 		} completion:nil];
-// 	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
-// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-// 			[self setAlpha:1.0];
-// 		} completion:nil];
-// 	}
+	if ([notification.name isEqual:@"juinHideElements"]) {
+		[UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			[self setAlpha:0.0];
+		} completion:nil];
+	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
+		[UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			[self setAlpha:1.0];
+		} completion:nil];
+	}
 
-// }
+}
 
-// - (void)dealloc { // remove observer
+- (void)dealloc { // remove observer
 	
-// 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     
-// 	%orig;
+	%orig;
 
-// }
+}
 
-// %end
+%end
 
-// %hook CSHomeAffordanceView
+%hook CSTeachableMomentsContainerView
 
-// - (id)initWithFrame:(CGRect)frame { // add notification observer
-
-//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
-// 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
-
-// 	return %orig;
-
-// }
-
-// %new
-// - (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide homebar
-
-// 	if ([notification.name isEqual:@"juinHideElements"]) {
-// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-// 			[self setAlpha:0.0];
-// 		} completion:nil];
-// 	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
-// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-// 			[self setAlpha:1.0];
-// 		} completion:nil];
-// 	}
-
-// }
-
-// - (void)dealloc { // remove observer
+- (void)_layoutCallToActionLabel { // hide unlock text on homebar devices when playing
 	
-// 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-// 	%orig;
+	%orig;
 
-// }
+	SBUILegibilityLabel* label = MSHookIvar<SBUILegibilityLabel *>(self, "_callToActionLabel");
 
-// %end
+	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+		[label setHidden:NO];
+		return;
+	}
 
-// %hook CSPageControl
+	[label setHidden:YES];	
 
-// - (id)initWithFrame:(CGRect)frame { // add notification observer
+}
 
-//     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinHideElements" object:nil];
-// 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveFadeNotification:) name:@"juinUnhideElements" object:nil];
+%end
 
-// 	return %orig;
+%hook SBUICallToActionLabel
 
-// }
+- (void)didMoveToWindow { // hide unlock text on home button devices when playing
 
-// %new
-// - (void)receiveFadeNotification:(NSNotification *)notification { // hide or unhide page dots
+	%orig;
 
-// 	if ([notification.name isEqual:@"juinHideElements"]) {
-// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-// 			[self setAlpha:0.0];
-// 		} completion:nil];
-// 	} else if ([notification.name isEqual:@"juinUnhideElements"]) {
-// 		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-// 			[self setAlpha:1.0];
-// 		} completion:nil];
-// 	}
+	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+		[self setHidden:NO];
+		return;
+	}
 
-// }
+	[self setHidden:YES];	
 
-// - (void)dealloc { // remove observer
-	
-// 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-// 	%orig;
+}
 
-// }
+- (void)_updateLabelTextWithLanguage:(id)arg1 { // hide unlock text on home button devices when playing
 
-// %end
+	%orig;
 
-// %end
+	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+		[self setHidden:NO];
+		return;
+	}
+
+	[self setHidden:YES];	
+
+}
+
+%end
+
+%end
 
 %group JuinData
 
@@ -390,8 +380,12 @@ MediaControlsTimeControl* timeSlider;
 				[songLabel setText:[NSString stringWithFormat:@"%@ ", [dict objectForKey:(__bridge NSString*)kMRMediaRemoteNowPlayingInfoTitle]]]; // set song title
 				[artistLabel setText:[NSString stringWithFormat:@"%@ ", [dict objectForKey:(__bridge NSString*)kMRMediaRemoteNowPlayingInfoArtist]]]; // set artist name
 
-                if (dict[(__bridge NSString *)kMRMediaRemoteNowPlayingInfoArtworkData]) // set artwork
-					[backgroundArtwork setImage:currentArtwork];
+				// set artwork
+                if (dict[(__bridge NSString *)kMRMediaRemoteNowPlayingInfoArtworkData]) {
+					[UIView transitionWithView:backgroundArtwork duration:0.15 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+						[backgroundArtwork setImage:currentArtwork];
+					} completion:nil];
+				}
 				
 				// unhide elements
                 [backgroundArtwork setHidden:NO];
@@ -454,6 +448,6 @@ MediaControlsTimeControl* timeSlider;
 
 	%init(Juin);
 	%init(JuinData);
-	// %init(JuinHiding);
+	%init(JuinHiding);
 
 }
