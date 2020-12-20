@@ -177,7 +177,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// gesture view
-	if (!gestureView) gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3)];
+	if (!gestureView) gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3 - [offsetValue intValue])];
 	[gestureView setBackgroundColor:[UIColor clearColor]];
 	[juinView addSubview:gestureView];
 
