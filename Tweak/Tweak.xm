@@ -77,6 +77,7 @@ MediaControlsTimeControl* timeSlider;
 	// juin view
 	if (!juinView) juinView = [[UIView alloc] initWithFrame:[self bounds]];
 	[juinView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+	[juinView setHidden:YES];
 	[self addSubview:juinView];
 
 
