@@ -12,8 +12,8 @@ MediaControlsTimeControl* timeSlider;
 
 	%orig;
 
-	if (backgroundArtworkSwitch && !backgroundArtwork) {
-		backgroundArtwork = [[UIImageView alloc] initWithFrame:[[self view] bounds]];
+	if (backgroundArtworkSwitch) {
+		if (!backgroundArtwork) backgroundArtwork = [[UIImageView alloc] initWithFrame:[[self view] bounds]];
 		[backgroundArtwork setContentMode:UIViewContentModeScaleAspectFill];
 		[backgroundArtwork setHidden:YES];
 		[[self view] insertSubview:backgroundArtwork atIndex:0];
@@ -196,7 +196,7 @@ MediaControlsTimeControl* timeSlider;
 	}
 
 	if (rightSwipeSwitch) {
-		if (rightSwipe) rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		if (!rightSwipe) rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
 		[rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
 		[gestureView addGestureRecognizer:rightSwipe];
 	}
