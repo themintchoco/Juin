@@ -1,5 +1,7 @@
 #import "Juin.h"
 
+BOOL enabled;
+
 MediaControlsTimeControl* timeSlider;
 
 %group Juin
@@ -10,11 +12,28 @@ MediaControlsTimeControl* timeSlider;
 
 	%orig;
 
-	if (!backgroundArtwork) {
+	if (backgroundArtworkSwitch && !backgroundArtwork) {
 		backgroundArtwork = [[UIImageView alloc] initWithFrame:[[self view] bounds]];
 		[backgroundArtwork setContentMode:UIViewContentModeScaleAspectFill];
 		[backgroundArtwork setHidden:YES];
 		[[self view] insertSubview:backgroundArtwork atIndex:0];
+
+		if (addBlurSwitch && !blur) {
+			if (!blur) {
+				if ([blurModeValue intValue] == 0)
+					blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+				else if ([blurModeValue intValue] == 1)
+					blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+				else if ([blurModeValue intValue] == 2)
+					blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular];
+				blurView = [[UIVisualEffectView alloc] initWithEffect:blur];
+				[blurView setFrame:[backgroundArtwork bounds]];
+				[blurView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+				[blurView setClipsToBounds:YES];
+				[blurView setAlpha:[blurAmountValue doubleValue]];
+				[backgroundArtwork addSubview:blurView];
+			}
+		}
 	}
 
 }
@@ -65,7 +84,6 @@ MediaControlsTimeControl* timeSlider;
 	CAGradientLayer* gradient = [CAGradientLayer layer];
 	[gradient setFrame:[backgroundGradient bounds]];
 	[gradient setColors:@[(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor]]];
-	[backgroundGradient setHidden:YES];
 	[[backgroundGradient layer] insertSublayer:gradient atIndex:0];
 	[juinView addSubview:backgroundGradient];
 
@@ -73,25 +91,22 @@ MediaControlsTimeControl* timeSlider;
 	// source button
 	sourceButton = [[UIButton alloc] init];
 	[[sourceButton titleLabel] setFont:[UIFont fontWithName:@"CircularSpUI-Book" size:10]];
-	[sourceButton setTintColor:[UIColor colorWithRed: 0.11 green: 0.73 blue: 0.33 alpha: 1.00]];
+	[sourceButton setTintColor:[UIColor whiteColor]];
 	[sourceButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
 	[sourceButton setTitle:[NSString stringWithFormat:@"%@", [[UIDevice currentDevice] name]] forState:UIControlStateNormal];
-	// [sourceButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/listeningOnAnotherDevice.png"] forState:UIControlStateNormal];
-	[sourceButton setHidden:YES];
 
 	[sourceButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [sourceButton.widthAnchor constraintEqualToConstant:juinView.bounds.size.width].active = YES;
     [sourceButton.heightAnchor constraintEqualToConstant:24].active = YES;
     if (![sourceButton isDescendantOfView:juinView]) [juinView addSubview:sourceButton];
     [sourceButton.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [sourceButton.centerYAnchor constraintEqualToAnchor:self.bottomAnchor constant:-24].active = YES;
+    [sourceButton.centerYAnchor constraintEqualToAnchor:self.bottomAnchor constant:-[offsetValue intValue]].active = YES;
 
 
 	// play/pause button
 	playPauseButton = [[UIButton alloc] init];
 	[playPauseButton addTarget:self action:@selector(pausePlaySong) forControlEvents:UIControlEventTouchUpInside];
 	[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/paused.png"] forState:UIControlStateNormal];
-	[playPauseButton setHidden:YES];
 
 	[playPauseButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [playPauseButton.widthAnchor constraintEqualToConstant:72].active = YES;
@@ -105,11 +120,11 @@ MediaControlsTimeControl* timeSlider;
 	rewindButton = [[UIButton alloc] init];
 	[rewindButton addTarget:self action:@selector(rewindSong) forControlEvents:UIControlEventTouchUpInside];
 	[rewindButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/rewind.png"] forState:UIControlStateNormal];
-	[rewindButton setHidden:YES];
+	[rewindButton setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
 
 	[rewindButton setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [rewindButton.widthAnchor constraintEqualToConstant:24].active = YES;
-    [rewindButton.heightAnchor constraintEqualToConstant:24].active = YES;
+    [rewindButton.widthAnchor constraintEqualToConstant:34].active = YES;
+    [rewindButton.heightAnchor constraintEqualToConstant:34].active = YES;
     if (![rewindButton isDescendantOfView:juinView]) [juinView addSubview:rewindButton];
     [rewindButton.centerXAnchor constraintEqualToAnchor:playPauseButton.leftAnchor constant:-60].active = YES;
     [rewindButton.centerYAnchor constraintEqualToAnchor:sourceButton.topAnchor constant:-50].active = YES;
@@ -119,11 +134,11 @@ MediaControlsTimeControl* timeSlider;
 	skipButton = [[UIButton alloc] init];
 	[skipButton addTarget:self action:@selector(skipSong) forControlEvents:UIControlEventTouchUpInside];
 	[skipButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/skip.png"] forState:UIControlStateNormal];
-	[skipButton setHidden:YES];
+	[skipButton setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
 
 	[skipButton setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [skipButton.widthAnchor constraintEqualToConstant:24].active = YES;
-    [skipButton.heightAnchor constraintEqualToConstant:24].active = YES;
+    [skipButton.widthAnchor constraintEqualToConstant:34].active = YES;
+    [skipButton.heightAnchor constraintEqualToConstant:34].active = YES;
     if (![skipButton isDescendantOfView:juinView]) [juinView addSubview:skipButton];
     [skipButton.centerXAnchor constraintEqualToAnchor:playPauseButton.rightAnchor constant:60].active = YES;
     [skipButton.centerYAnchor constraintEqualToAnchor:sourceButton.topAnchor constant:-50].active = YES;
@@ -135,7 +150,6 @@ MediaControlsTimeControl* timeSlider;
 	[artistLabel setTextColor:[UIColor colorWithRed: 0.60 green: 0.60 blue: 0.60 alpha: 1.00]];
 	[artistLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:22]];
 	[artistLabel setTextAlignment:NSTextAlignmentCenter];
-	[artistLabel setHidden:YES];
 
 	[artistLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [artistLabel.widthAnchor constraintEqualToConstant:279].active = YES;
@@ -151,7 +165,6 @@ MediaControlsTimeControl* timeSlider;
 	[songLabel setTextColor:[UIColor whiteColor]];
 	[songLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:36]];
 	[songLabel setTextAlignment:NSTextAlignmentCenter];
-	[songLabel setHidden:YES];
 
 	[songLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [songLabel.widthAnchor constraintEqualToConstant:279].active = YES;
@@ -165,8 +178,21 @@ MediaControlsTimeControl* timeSlider;
 	UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
 	[tap setNumberOfTapsRequired:1];
 	[tap setNumberOfTouchesRequired:1];
-
 	[juinView addGestureRecognizer:tap];
+
+
+	// swipe gestures
+	if (leftSwipeSwitch) {
+		UISwipeGestureRecognizer* leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		[leftSwipe setDirection:UISwipeGestureRecognizerDirectionLeft];
+		[juinView addGestureRecognizer:leftSwipe];
+	}
+
+	if (rightSwipeSwitch) {
+		UISwipeGestureRecognizer* rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		[rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
+		[juinView addGestureRecognizer:rightSwipe];
+	}
 
 }
 
@@ -210,19 +236,25 @@ MediaControlsTimeControl* timeSlider;
 }
 
 %new
-- (void)hideJuinView { // hide or unhide juin
+- (void)hideJuinView { // hide juin on tap
 
-	if (![juinView isHidden]) {
-		[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-			[juinView setHidden:YES];
-			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
-		} completion:nil];
-	} else {
-		[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-			[juinView setHidden:NO];
-			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
-		} completion:nil];
-	}
+	if ([juinView isHidden]) return;
+	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
+
+	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+		[juinView setHidden:YES];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
+	} completion:nil];
+
+}
+
+%new
+- (void)handleSwipe:(UISwipeGestureRecognizer *)sender { // rewind/skip song based on swipe direction
+
+	if (sender.direction == UISwipeGestureRecognizerDirectionLeft)
+		[self skipSong];
+	else if (sender.direction == UISwipeGestureRecognizerDirectionRight)
+		[self rewindSong];
 
 }
 
@@ -235,6 +267,7 @@ MediaControlsTimeControl* timeSlider;
 	%orig;
 
 	if (![juinView isHidden]) return;
+	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
 
 	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 		[juinView setHidden:NO];
@@ -332,7 +365,7 @@ MediaControlsTimeControl* timeSlider;
 
 	SBUILegibilityLabel* label = MSHookIvar<SBUILegibilityLabel *>(self, "_callToActionLabel");
 
-	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+	if ([juinView isHidden]) {
 		[label setHidden:NO];
 		return;
 	}
@@ -349,12 +382,12 @@ MediaControlsTimeControl* timeSlider;
 
 	%orig;
 
-	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+	if ([juinView isHidden]) {
 		[self setHidden:NO];
 		return;
 	}
 
-	[self setHidden:YES];	
+	[self setHidden:YES];
 
 }
 
@@ -362,12 +395,12 @@ MediaControlsTimeControl* timeSlider;
 
 	%orig;
 
-	if (!([[%c(SBMediaController) sharedInstance] isPlaying] && [[%c(SBMediaController) sharedInstance] isPaused])) {
+	if ([juinView isHidden]) {
 		[self setHidden:NO];
 		return;
 	}
 
-	[self setHidden:YES];	
+	[self setHidden:YES];
 
 }
 
@@ -399,29 +432,15 @@ MediaControlsTimeControl* timeSlider;
 					} completion:nil];
 				}
 				
-				// unhide elements
-                [backgroundArtwork setHidden:NO];
-				[backgroundGradient setHidden:NO];
-				[sourceButton setHidden:NO];
-				[playPauseButton setHidden:NO];
-				[rewindButton setHidden:NO];
-				[skipButton setHidden:NO];
-				[artistLabel setHidden:NO];
-				[songLabel setHidden:NO];
-				[timeSlider setHidden:NO];
+				// unhide juin
+				[backgroundArtwork setHidden:NO];
+                [juinView setHidden:NO];
 
 				[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
             }
-        } else { // hide everything if not playing
-            [backgroundArtwork setHidden:YES];
-			[backgroundGradient setHidden:YES];
-			[sourceButton setHidden:YES];
-			[playPauseButton setHidden:YES];
-			[rewindButton setHidden:YES];
-			[skipButton setHidden:YES];
-			[artistLabel setHidden:YES];
-			[songLabel setHidden:YES];
-			[timeSlider setHidden:YES];
+        } else { // hide juin if not playing
+			[backgroundArtwork setHidden:YES];
+            [juinView setHidden:YES];
 
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
         }
@@ -429,7 +448,7 @@ MediaControlsTimeControl* timeSlider;
     
 }
 
-- (void)_mediaRemoteNowPlayingApplicationIsPlayingDidChange:(id)arg1 { // get play/pause event
+- (void)_mediaRemoteNowPlayingApplicationIsPlayingDidChange:(id)arg1 { // get play/pause state change
 
     %orig;
 
@@ -458,8 +477,27 @@ MediaControlsTimeControl* timeSlider;
 
 %ctor {
 
-	%init(Juin);
-	%init(JuinData);
-	%init(JuinHiding);
+	preferences = [[HBPreferences alloc] initWithIdentifier:@"love.litten.juinpreferences"];
+
+	[preferences registerBool:&enabled default:nil forKey:@"Enabled"];
+
+	// background artwork
+	[preferences registerBool:&backgroundArtworkSwitch default:YES forKey:@"backgroundArtwork"];
+	[preferences registerBool:&addBlurSwitch default:NO forKey:@"addBlur"];
+	[preferences registerObject:&blurModeValue default:@"2" forKey:@"blurMode"];
+	[preferences registerObject:&blurAmountValue default:@"1.0" forKey:@"blurAmount"];
+
+	// gestures
+	[preferences registerBool:&leftSwipeSwitch default:YES forKey:@"leftSwipe"];
+	[preferences registerBool:&rightSwipeSwitch default:YES forKey:@"rightSwipe"];
+
+	// miscellaneous
+	[preferences registerObject:&offsetValue default:@"24" forKey:@"offset"];
+	
+	if (enabled) {
+		%init(Juin);
+		%init(JuinData);
+		%init(JuinHiding);
+	}
 
 }

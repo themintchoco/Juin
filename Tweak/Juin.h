@@ -3,8 +3,14 @@
 #import <MediaRemote/MediaRemote.h>
 #import <CoreText/CoreText.h>
 #import "MarqueeLabel.h"
+#import <Cephei/HBPreferences.h>
 
+HBPreferences* preferences;
+
+BOOL firstTimeLoaded = NO;
 UIImageView* backgroundArtwork;
+UIVisualEffectView* blurView;
+UIBlurEffect* blur;
 UIImage* currentArtwork;
 UIView* juinView;
 UIView* backgroundGradient;
@@ -15,7 +21,20 @@ UIButton* skipButton;
 UILabel* artistLabel;
 UILabel* songLabel;
 
-BOOL firstTimeLoaded = NO;
+extern BOOL enabled;
+
+// background
+BOOL backgroundArtworkSwitch = YES;
+BOOL addBlurSwitch = NO;
+NSString* blurModeValue = @"2";
+NSString* blurAmountValue = @"1.0";
+
+// gestures
+BOOL leftSwipeSwitch = YES;
+BOOL rightSwipeSwitch = YES;
+
+// miscellaneous
+NSString* offsetValue = @"24";
 
 @interface CSCoverSheetViewController : UIViewController
 @end
@@ -25,6 +44,7 @@ BOOL firstTimeLoaded = NO;
 - (void)skipSong;
 - (void)pausePlaySong;
 - (void)hideJuinView;
+- (void)handleSwipe:(UISwipeGestureRecognizer *)sender;
 @end
 
 @interface MediaControlsTimeControl : UIControl
