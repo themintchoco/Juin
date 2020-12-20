@@ -20,6 +20,10 @@ UIButton* rewindButton;
 UIButton* skipButton;
 UILabel* artistLabel;
 UILabel* songLabel;
+UIView* gestureView;
+UITapGestureRecognizer* tap;
+UISwipeGestureRecognizer* leftSwipe;
+UISwipeGestureRecognizer* rightSwipe;
 
 extern BOOL enabled;
 

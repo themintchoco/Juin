@@ -76,6 +76,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// juin view
 	juinView = [[UIView alloc] initWithFrame:[self bounds]];
+	[juinView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 	[self addSubview:juinView];
 
 
@@ -173,25 +174,31 @@ MediaControlsTimeControl* timeSlider;
     [songLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [songLabel.centerYAnchor constraintEqualToAnchor:artistLabel.topAnchor constant:-24].active = YES;
 
+
+	// gesture view
+	gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3)];
+	[gestureView setBackgroundColor:[UIColor clearColor]];
+	[juinView addSubview:gestureView];
+
 	
 	// tap gesture
-	UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
+	tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
 	[tap setNumberOfTapsRequired:1];
 	[tap setNumberOfTouchesRequired:1];
-	[juinView addGestureRecognizer:tap];
+	[gestureView addGestureRecognizer:tap];
 
 
 	// swipe gestures
 	if (leftSwipeSwitch) {
-		UISwipeGestureRecognizer* leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
 		[leftSwipe setDirection:UISwipeGestureRecognizerDirectionLeft];
-		[juinView addGestureRecognizer:leftSwipe];
+		[gestureView addGestureRecognizer:leftSwipe];
 	}
 
 	if (rightSwipeSwitch) {
-		UISwipeGestureRecognizer* rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
 		[rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
-		[juinView addGestureRecognizer:rightSwipe];
+		[gestureView addGestureRecognizer:rightSwipe];
 	}
 
 }
