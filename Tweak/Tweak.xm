@@ -50,7 +50,7 @@ MediaControlsTimeControl* timeSlider;
 	firstTimeLoaded = YES;
 
 	// load cirlularspui-book font
-	NSData* inData = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:@"/Library/Juin/CircularSpUI-Book.otf"]];
+	NSData* inData = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:@"/Library/PreferenceBundles/JuinPrefs.bundle/CircularSpUI-Book.otf"]];
     CFErrorRef error;
     CGDataProviderRef provider = CGDataProviderCreateWithCFData((CFDataRef)inData);
     CGFontRef font = CGFontCreateWithDataProvider(provider);
@@ -62,7 +62,7 @@ MediaControlsTimeControl* timeSlider;
     CFRelease(provider);
 
 	// load cirlularspui-bold font
-	NSData* inData2 = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:@"/Library/Juin/CircularSpUI-Bold.otf"]];
+	NSData* inData2 = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:@"/Library/PreferenceBundles/JuinPrefs.bundle/CircularSpUI-Bold.otf"]];
     CFErrorRef error2;
     CGDataProviderRef provider2 = CGDataProviderCreateWithCFData((CFDataRef)inData2);
     CGFontRef font2 = CGFontCreateWithDataProvider(provider2);
@@ -95,7 +95,8 @@ MediaControlsTimeControl* timeSlider;
 	[[sourceButton titleLabel] setFont:[UIFont fontWithName:@"CircularSpUI-Book" size:10]];
 	[sourceButton setTintColor:[UIColor whiteColor]];
 	[sourceButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
-	[sourceButton setTitle:[NSString stringWithFormat:@"%@", [[UIDevice currentDevice] name]] forState:UIControlStateNormal];
+	if (showDeviceNameSwitch) [sourceButton setTitle:[NSString stringWithFormat:@"%@", [[UIDevice currentDevice] name]] forState:UIControlStateNormal];
+	else [sourceButton setTitle:@"" forState:UIControlStateNormal];
 
 	[sourceButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [sourceButton.widthAnchor constraintEqualToConstant:juinView.bounds.size.width].active = YES;
@@ -108,7 +109,7 @@ MediaControlsTimeControl* timeSlider;
 	// play/pause button
 	if (!playPauseButton) playPauseButton = [[UIButton alloc] init];
 	[playPauseButton addTarget:self action:@selector(pausePlaySong) forControlEvents:UIControlEventTouchUpInside];
-	[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/paused.png"] forState:UIControlStateNormal];
+	[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/paused.png"] forState:UIControlStateNormal];
 
 	[playPauseButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [playPauseButton.widthAnchor constraintEqualToConstant:72].active = YES;
@@ -121,7 +122,7 @@ MediaControlsTimeControl* timeSlider;
 	// rewind button
 	if (!rewindButton) rewindButton = [[UIButton alloc] init];
 	[rewindButton addTarget:self action:@selector(rewindSong) forControlEvents:UIControlEventTouchUpInside];
-	[rewindButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/rewind.png"] forState:UIControlStateNormal];
+	[rewindButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/rewind.png"] forState:UIControlStateNormal];
 	[rewindButton setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
 
 	[rewindButton setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -135,7 +136,7 @@ MediaControlsTimeControl* timeSlider;
 	// skip button
 	if (!skipButton) skipButton = [[UIButton alloc] init];
 	[skipButton addTarget:self action:@selector(skipSong) forControlEvents:UIControlEventTouchUpInside];
-	[skipButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/skip.png"] forState:UIControlStateNormal];
+	[skipButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/skip.png"] forState:UIControlStateNormal];
 	[skipButton setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
 
 	[skipButton setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -237,9 +238,9 @@ MediaControlsTimeControl* timeSlider;
 	[[%c(SBMediaController) sharedInstance] togglePlayPauseForEventSource:0];
 	
 	if ([[%c(SBMediaController) sharedInstance] isPlaying])
-		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/playing.png"] forState:UIControlStateNormal];
+		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/playing.png"] forState:UIControlStateNormal];
 	else
-		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/paused.png"] forState:UIControlStateNormal];
+		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/paused.png"] forState:UIControlStateNormal];
 
 }
 
@@ -461,9 +462,9 @@ MediaControlsTimeControl* timeSlider;
     %orig;
 
 	if ([self isPlaying])
-		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/playing.png"] forState:UIControlStateNormal];
+		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/playing.png"] forState:UIControlStateNormal];
 	else
-		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/paused.png"] forState:UIControlStateNormal];
+		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/paused.png"] forState:UIControlStateNormal];
 
 }
 
@@ -501,6 +502,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// miscellaneous
 	[preferences registerObject:&offsetValue default:@"24" forKey:@"offset"];
+	[preferences registerBool:&showDeviceNameSwitch default:YES forKey:@"showDeviceName"];
 	
 	if (enabled) {
 		%init(Juin);

@@ -40,6 +40,7 @@ BOOL rightSwipeSwitch = YES;
 
 // miscellaneous
 NSString* offsetValue = @"24";
+BOOL showDeviceNameSwitch = YES;
 
 @interface CSCoverSheetViewController : UIViewController
 @end
