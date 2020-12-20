@@ -14,6 +14,7 @@ UIBlurEffect* blur;
 UIImage* currentArtwork;
 UIView* juinView;
 UIView* backgroundGradient;
+CAGradientLayer* gradient;
 UIButton* sourceButton;
 UIButton* playPauseButton;
 UIButton* rewindButton;

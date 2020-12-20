@@ -75,14 +75,14 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// juin view
-	juinView = [[UIView alloc] initWithFrame:[self bounds]];
+	if (!juinView) juinView = [[UIView alloc] initWithFrame:[self bounds]];
 	[juinView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 	[self addSubview:juinView];
 
 
 	// gradient
-	backgroundGradient = [[UIView alloc] initWithFrame:[juinView bounds]];
-	CAGradientLayer* gradient = [CAGradientLayer layer];
+	if (!backgroundGradient) backgroundGradient = [[UIView alloc] initWithFrame:[juinView bounds]];
+	if (!gradient) gradient = [CAGradientLayer layer];
 	[gradient setFrame:[backgroundGradient bounds]];
 	[gradient setColors:@[(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor]]];
 	[[backgroundGradient layer] insertSublayer:gradient atIndex:0];
@@ -90,7 +90,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// source button
-	sourceButton = [[UIButton alloc] init];
+	if (!sourceButton) sourceButton = [[UIButton alloc] init];
 	[[sourceButton titleLabel] setFont:[UIFont fontWithName:@"CircularSpUI-Book" size:10]];
 	[sourceButton setTintColor:[UIColor whiteColor]];
 	[sourceButton setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
@@ -105,7 +105,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// play/pause button
-	playPauseButton = [[UIButton alloc] init];
+	if (!playPauseButton) playPauseButton = [[UIButton alloc] init];
 	[playPauseButton addTarget:self action:@selector(pausePlaySong) forControlEvents:UIControlEventTouchUpInside];
 	[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/paused.png"] forState:UIControlStateNormal];
 
@@ -118,7 +118,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// rewind button
-	rewindButton = [[UIButton alloc] init];
+	if (!rewindButton) rewindButton = [[UIButton alloc] init];
 	[rewindButton addTarget:self action:@selector(rewindSong) forControlEvents:UIControlEventTouchUpInside];
 	[rewindButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/rewind.png"] forState:UIControlStateNormal];
 	[rewindButton setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
@@ -132,7 +132,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// skip button
-	skipButton = [[UIButton alloc] init];
+	if (!skipButton) skipButton = [[UIButton alloc] init];
 	[skipButton addTarget:self action:@selector(skipSong) forControlEvents:UIControlEventTouchUpInside];
 	[skipButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/skip.png"] forState:UIControlStateNormal];
 	[skipButton setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
@@ -146,7 +146,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// artist label
-	artistLabel = [[UILabel alloc] init];
+	if (!artistLabel) artistLabel = [[UILabel alloc] init];
 	[artistLabel setText:@"Far Places"];
 	[artistLabel setTextColor:[UIColor colorWithRed: 0.60 green: 0.60 blue: 0.60 alpha: 1.00]];
 	[artistLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:22]];
@@ -161,7 +161,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// song label
-	songLabel = [[MarqueeLabel alloc] init];
+	if (!songLabel) songLabel = [[MarqueeLabel alloc] init];
 	[songLabel setText:@"In My Head"];
 	[songLabel setTextColor:[UIColor whiteColor]];
 	[songLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:36]];
@@ -176,13 +176,13 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// gesture view
-	gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3)];
+	if (!gestureView) gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3)];
 	[gestureView setBackgroundColor:[UIColor clearColor]];
 	[juinView addSubview:gestureView];
 
 	
 	// tap gesture
-	tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
+	if (!tap) tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
 	[tap setNumberOfTapsRequired:1];
 	[tap setNumberOfTouchesRequired:1];
 	[gestureView addGestureRecognizer:tap];
@@ -190,13 +190,13 @@ MediaControlsTimeControl* timeSlider;
 
 	// swipe gestures
 	if (leftSwipeSwitch) {
-		leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		if (!leftSwipe) leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
 		[leftSwipe setDirection:UISwipeGestureRecognizerDirectionLeft];
 		[gestureView addGestureRecognizer:leftSwipe];
 	}
 
 	if (rightSwipeSwitch) {
-		rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
+		if (rightSwipe) rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
 		[rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
 		[gestureView addGestureRecognizer:rightSwipe];
 	}
