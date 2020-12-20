@@ -41,6 +41,9 @@ BOOL firstTimeLoaded = NO;
 @interface CSAdjunctItemView : UIView
 @end
 
+@interface CSNotificationAdjunctListViewController : UIViewController
+@end
+
 @interface CSQuickActionsButton : UIControl
 - (void)receiveFadeNotification:(NSNotification *)notification;
 @end

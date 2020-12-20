@@ -89,7 +89,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// play/pause button
 	playPauseButton = [[UIButton alloc] init];
-	[playPauseButton addTarget:self action:@selector(pausePlaySong) forControlEvents:UIControlEventTouchDown];
+	[playPauseButton addTarget:self action:@selector(pausePlaySong) forControlEvents:UIControlEventTouchUpInside];
 	[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/paused.png"] forState:UIControlStateNormal];
 	[playPauseButton setHidden:YES];
 
@@ -103,7 +103,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// rewind button
 	rewindButton = [[UIButton alloc] init];
-	[rewindButton addTarget:self action:@selector(rewindSong) forControlEvents:UIControlEventTouchDown];
+	[rewindButton addTarget:self action:@selector(rewindSong) forControlEvents:UIControlEventTouchUpInside];
 	[rewindButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/rewind.png"] forState:UIControlStateNormal];
 	[rewindButton setHidden:YES];
 
@@ -117,7 +117,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// skip button
 	skipButton = [[UIButton alloc] init];
-	[skipButton addTarget:self action:@selector(skipSong) forControlEvents:UIControlEventTouchDown];
+	[skipButton addTarget:self action:@selector(skipSong) forControlEvents:UIControlEventTouchUpInside];
 	[skipButton setImage:[UIImage imageWithContentsOfFile:@"/Library/Juin/skip.png"] forState:UIControlStateNormal];
 	[skipButton setHidden:YES];
 
@@ -267,6 +267,18 @@ MediaControlsTimeControl* timeSlider;
 
 	[self.heightAnchor constraintEqualToConstant:0].active = true;
 	[self setHidden:YES];
+
+}
+
+%end
+
+%hook CSNotificationAdjunctListViewController
+
+- (void)viewDidLoad { // make the time slider bright
+
+	%orig;
+
+    [self setOverrideUserInterfaceStyle:2];
 
 }
 
