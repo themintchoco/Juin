@@ -14,6 +14,7 @@ MediaControlsTimeControl* timeSlider;
 
 	if (backgroundArtworkSwitch) {
 		if (!backgroundArtwork) backgroundArtwork = [[UIImageView alloc] initWithFrame:[[self view] bounds]];
+		[backgroundArtwork setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 		[backgroundArtwork setContentMode:UIViewContentModeScaleAspectFill];
 		[backgroundArtwork setHidden:YES];
 		[[self view] insertSubview:backgroundArtwork atIndex:0];
@@ -179,6 +180,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// gesture view
 	if (!gestureView) gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3 - [offsetValue intValue])];
+	[gestureView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 	[gestureView setBackgroundColor:[UIColor clearColor]];
 	[juinView addSubview:gestureView];
 
