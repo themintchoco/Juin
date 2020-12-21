@@ -1,9 +1,18 @@
 # Juin
 Spotify inspired lockscreen player
 
-## Installation
-1. Add this repository to your Package Manager: https://repo.litten.love
-2. Install Juin
+This fork is based off Litteeen's Juin 1.0
 
-## Compiling
+## Changes
+\+ Option to Double Tap to Show/Hide 
+
+\+ Option to Hide by default on wake/pulling down notifications
+
+\+ Hides automatically when scrolling to view notifications
+
+\- Removed Swipe to Skip
+
+## Installation
+Build from source and install 
+
 No dependencies, just make package (make clean package)
