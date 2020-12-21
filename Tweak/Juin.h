@@ -38,19 +38,29 @@ NSString* blurAmountValue = @"1.0";
 BOOL leftSwipeSwitch = YES;
 BOOL rightSwipeSwitch = YES;
 
+// hide by default
+BOOL hideOnWakeSwitch = NO;
+BOOL hideOnViewNotificationsSwitch = NO;
+BOOL hideDueToTap = NO;
+
 // miscellaneous
 NSString* offsetValue = @"24";
 BOOL showDeviceNameSwitch = YES;
-
-@interface CSCoverSheetViewController : UIViewController
-@end
 
 @interface CSCoverSheetView : UIView
 - (void)rewindSong;
 - (void)skipSong;
 - (void)pausePlaySong;
 - (void)hideJuinView;
+- (void)showJuinView;
+- (void)handleTap;
 - (void)handleSwipe:(UISwipeGestureRecognizer *)sender;
+@end
+
+@interface CSCoverSheetViewController : UIViewController
+@property (assign,getter=isAuthenticated,nonatomic) BOOL authenticated; 
+@property (nonatomic,readonly) CSCoverSheetView * coverSheetView; 
+- (void)setAuthenticated:(BOOL)authenticated;
 @end
 
 @interface MediaControlsTimeControl : UIControl

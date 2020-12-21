@@ -39,6 +39,40 @@ MediaControlsTimeControl* timeSlider;
 
 }
 
+- (void)viewWillAppear:(BOOL)animated { // hide by default
+	
+	%orig;
+
+	if ([self isAuthenticated]) {
+		// notifications view
+		if (hideOnViewNotificationsSwitch) 
+			[[self coverSheetView] hideJuinView];
+		else if (!hideDueToTap)
+			[[self coverSheetView] showJuinView];
+	} else {
+		// lock screen
+		if (hideOnWakeSwitch) 
+			[[self coverSheetView] hideJuinView];
+		else if (!hideDueToTap)
+			[[self coverSheetView] showJuinView];
+	}
+
+}
+
+- (void)setAuthenticated:(BOOL)authenticated { // hide by default
+
+	%orig;
+
+	if (!authenticated) {
+		// screen locked
+		if (hideOnWakeSwitch) 
+			[[self coverSheetView] hideJuinView];
+		else if (!hideDueToTap)
+			[[self coverSheetView] showJuinView];
+	}
+
+}
+
 %end
 
 %hook CSCoverSheetView
@@ -186,7 +220,7 @@ MediaControlsTimeControl* timeSlider;
 
 	
 	// tap gesture
-	if (!tap) tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideJuinView)];
+	if (!tap) tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap)];
 	[tap setNumberOfTapsRequired:1];
 	[tap setNumberOfTouchesRequired:1];
 	[gestureView addGestureRecognizer:tap];
@@ -247,7 +281,7 @@ MediaControlsTimeControl* timeSlider;
 }
 
 %new
-- (void)hideJuinView { // hide juin on tap
+- (void)hideJuinView { // hide juin
 
 	if ([juinView isHidden]) return;
 	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
@@ -257,6 +291,25 @@ MediaControlsTimeControl* timeSlider;
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
 	} completion:nil];
 
+}
+
+%new
+- (void)showJuinView { // show juin
+
+	if (![juinView isHidden]) return;
+	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
+
+	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+		[juinView setHidden:NO];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
+	} completion:nil];
+
+}
+
+%new
+- (void)handleTap {
+	hideDueToTap = YES;
+	[self hideJuinView];
 }
 
 %new
@@ -280,6 +333,7 @@ MediaControlsTimeControl* timeSlider;
 	if (![juinView isHidden]) return;
 	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
 
+	hideDueToTap = NO;
 	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 		[juinView setHidden:NO];
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
@@ -501,6 +555,10 @@ MediaControlsTimeControl* timeSlider;
 	// gestures
 	[preferences registerBool:&leftSwipeSwitch default:YES forKey:@"leftSwipe"];
 	[preferences registerBool:&rightSwipeSwitch default:YES forKey:@"rightSwipe"];
+
+	// hide by default
+	[preferences registerBool:&hideOnWakeSwitch default:NO forKey:@"hideOnWake"];
+	[preferences registerBool:&hideOnViewNotificationsSwitch default:NO forKey:@"hideOnViewNotifications"];
 
 	// miscellaneous
 	[preferences registerObject:&offsetValue default:@"24" forKey:@"offset"];
