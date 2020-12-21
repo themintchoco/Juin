@@ -317,9 +317,6 @@ MediaControlsTimeControl* timeSlider;
 %new
 - (void)handleTap:(UITapGestureRecognizer *)sender {
 
-	os_log(OS_LOG_DEFAULT, "[Juin] sender %{public}@ tap %{public}@ doubleTap %{public}@", sender, [[sender name] isEqualToString:@"juinGestureTap"] ? @"YES" : @"NO", [[sender name] isEqualToString:@"juinGestureDoubleTap"] ? @"YES" : @"NO");
-	os_log(OS_LOG_DEFAULT, "[Juin] doubleTapSwitch %{public}@", doubleTapSwitch ? @"YES" : @"NO");
-
 	if (([[sender name] isEqualToString:@"juinGestureTap"] && doubleTapSwitch) || ([[sender name] isEqualToString:@"juinGestureDoubleTap"] && !doubleTapSwitch)) return;
 
 	if ([juinView isHidden]) {
