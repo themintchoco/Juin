@@ -110,7 +110,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// juin view
-	if (!juinView) juinView = [[UIView alloc] initWithFrame:[self bounds]];
+	if (!juinView) juinView = [[PassthroughView alloc] initWithFrame:[self bounds]];
 	[juinView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 	[juinView setHidden:YES];
 	[self addSubview:juinView];
@@ -122,6 +122,7 @@ MediaControlsTimeControl* timeSlider;
 	[gradient setFrame:[backgroundGradient bounds]];
 	[gradient setColors:@[(id)[[UIColor clearColor] CGColor], (id)[[UIColor blackColor] CGColor]]];
 	[[backgroundGradient layer] insertSublayer:gradient atIndex:0];
+	[backgroundGradient setUserInteractionEnabled:NO];
 	[juinView addSubview:backgroundGradient];
 
 
@@ -184,7 +185,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// artist label
 	if (!artistLabel) artistLabel = [[UILabel alloc] init];
-	[artistLabel setText:@"Far Places"];
+	[artistLabel setText:@""];
 	[artistLabel setTextColor:[UIColor colorWithRed: 0.60 green: 0.60 blue: 0.60 alpha: 1.00]];
 	[artistLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:22]];
 	[artistLabel setTextAlignment:NSTextAlignmentCenter];
@@ -199,7 +200,7 @@ MediaControlsTimeControl* timeSlider;
 
 	// song label
 	if (!songLabel) songLabel = [[MarqueeLabel alloc] init];
-	[songLabel setText:@"In My Head"];
+	[songLabel setText:@""];
 	[songLabel setTextColor:[UIColor whiteColor]];
 	[songLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:36]];
 	[songLabel setTextAlignment:NSTextAlignmentCenter];
@@ -210,34 +211,6 @@ MediaControlsTimeControl* timeSlider;
     if (![songLabel isDescendantOfView:juinView]) [juinView addSubview:songLabel];
     [songLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [songLabel.centerYAnchor constraintEqualToAnchor:artistLabel.topAnchor constant:-24].active = YES;
-
-
-	// gesture view
-	if (!gestureView) gestureView = [[UIView alloc] initWithFrame:CGRectMake(juinView.bounds.origin.x, juinView.bounds.origin.y, juinView.bounds.size.width, juinView.bounds.size.height / 1.3 - [offsetValue intValue])];
-	[gestureView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-	[gestureView setBackgroundColor:[UIColor clearColor]];
-	[juinView addSubview:gestureView];
-
-	
-	// tap gesture
-	if (!tap) tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap)];
-	[tap setNumberOfTapsRequired:1];
-	[tap setNumberOfTouchesRequired:1];
-	[gestureView addGestureRecognizer:tap];
-
-
-	// swipe gestures
-	if (leftSwipeSwitch) {
-		if (!leftSwipe) leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
-		[leftSwipe setDirection:UISwipeGestureRecognizerDirectionLeft];
-		[gestureView addGestureRecognizer:leftSwipe];
-	}
-
-	if (rightSwipeSwitch) {
-		if (!rightSwipe) rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipe:)];
-		[rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
-		[gestureView addGestureRecognizer:rightSwipe];
-	}
 
 }
 
@@ -286,10 +259,8 @@ MediaControlsTimeControl* timeSlider;
 	if ([juinView isHidden]) return;
 	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
 
-	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-		[juinView setHidden:YES];
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
-	} completion:nil];
+	[juinView fadeOutWithDuration:0.1];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
 
 }
 
@@ -299,26 +270,8 @@ MediaControlsTimeControl* timeSlider;
 	if (![juinView isHidden]) return;
 	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
 
-	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-		[juinView setHidden:NO];
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
-	} completion:nil];
-
-}
-
-%new
-- (void)handleTap {
-	hideDueToTap = YES;
-	[self hideJuinView];
-}
-
-%new
-- (void)handleSwipe:(UISwipeGestureRecognizer *)sender { // rewind/skip song based on swipe direction
-
-	if (sender.direction == UISwipeGestureRecognizerDirectionLeft)
-		[self skipSong];
-	else if (sender.direction == UISwipeGestureRecognizerDirectionRight)
-		[self rewindSong];
+	[juinView fadeInWithDuration:0.1];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
 
 }
 
@@ -326,18 +279,58 @@ MediaControlsTimeControl* timeSlider;
 
 %hook NCNotificationListView
 
-- (void)touchesBegan:(id)arg1 withEvent:(id)arg2 { // unhide juin on tap
+- (id)initWithFrame:(struct CGRect)frame {
+	NCNotificationListView *instance = %orig;
 
+	instance.delaysContentTouches = NO;
+
+	tap = [[UITapGestureRecognizer alloc] initWithTarget:instance action:@selector(handleTap:)];
+	[tap setName:@"juinGestureTap"];
+
+	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:instance action:@selector(handleTap:)];
+	[doubleTap setNumberOfTapsRequired:2];
+	[doubleTap setName:@"juinGestureDoubleTap"];
+	[tap requireGestureRecognizerToFail:doubleTap];
+	
+	[tap setDelegate:(id<UIGestureRecognizerDelegate>)instance];
+	[doubleTap setDelegate:(id<UIGestureRecognizerDelegate>)instance];
+
+	[instance addGestureRecognizer:tap];
+	[instance addGestureRecognizer:doubleTap];
+
+	return instance;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+	return YES;
+}
+
+- (void)setRevealed:(_Bool)revealed {
 	%orig;
 
-	if (![juinView isHidden]) return;
-	if (![[%c(SBMediaController) sharedInstance] isPlaying] && ![[%c(SBMediaController) sharedInstance] isPaused]) return;
+	if (revealed) {
+		[juinView fadeOutWithDuration:0.4];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
+	}
+}
 
-	hideDueToTap = NO;
-	[UIView transitionWithView:juinView duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-		[juinView setHidden:NO];
+%new
+- (void)handleTap:(UITapGestureRecognizer *)sender {
+
+	os_log(OS_LOG_DEFAULT, "[Juin] sender %{public}@ tap %{public}@ doubleTap %{public}@", sender, [[sender name] isEqualToString:@"juinGestureTap"] ? @"YES" : @"NO", [[sender name] isEqualToString:@"juinGestureDoubleTap"] ? @"YES" : @"NO");
+	os_log(OS_LOG_DEFAULT, "[Juin] doubleTapSwitch %{public}@", doubleTapSwitch ? @"YES" : @"NO");
+
+	if (([[sender name] isEqualToString:@"juinGestureTap"] && doubleTapSwitch) || ([[sender name] isEqualToString:@"juinGestureDoubleTap"] && !doubleTapSwitch)) return;
+
+	if ([juinView isHidden]) {
+		hideDueToTap = NO;
+		[juinView fadeInWithDuration:0.4];
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinHideElements" object:nil];
-	} completion:nil];
+	} else {
+		hideDueToTap = YES;
+		[juinView fadeOutWithDuration:0.4];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"juinUnhideElements" object:nil];
+	}
 
 }
 
@@ -552,9 +545,8 @@ MediaControlsTimeControl* timeSlider;
 	[preferences registerObject:&blurModeValue default:@"2" forKey:@"blurMode"];
 	[preferences registerObject:&blurAmountValue default:@"1.0" forKey:@"blurAmount"];
 
-	// gestures
-	[preferences registerBool:&leftSwipeSwitch default:YES forKey:@"leftSwipe"];
-	[preferences registerBool:&rightSwipeSwitch default:YES forKey:@"rightSwipe"];
+	// double tap
+	[preferences registerBool:&doubleTapSwitch default:NO forKey:@"doubleTap"];
 
 	// hide by default
 	[preferences registerBool:&hideOnWakeSwitch default:NO forKey:@"hideOnWake"];

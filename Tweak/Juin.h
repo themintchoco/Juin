@@ -3,7 +3,9 @@
 #import <MediaRemote/MediaRemote.h>
 #import <CoreText/CoreText.h>
 #import "MarqueeLabel.h"
+#import "UIView+Extensions.h"
 #import <Cephei/HBPreferences.h>
+#import <os/log.h>
 
 HBPreferences* preferences;
 
@@ -12,7 +14,7 @@ UIImageView* backgroundArtwork;
 UIVisualEffectView* blurView;
 UIBlurEffect* blur;
 UIImage* currentArtwork;
-UIView* juinView;
+PassthroughView* juinView;
 UIView* backgroundGradient;
 CAGradientLayer* gradient;
 UIButton* sourceButton;
@@ -23,6 +25,7 @@ UILabel* artistLabel;
 UILabel* songLabel;
 UIView* gestureView;
 UITapGestureRecognizer* tap;
+UITapGestureRecognizer* doubleTap;
 UISwipeGestureRecognizer* leftSwipe;
 UISwipeGestureRecognizer* rightSwipe;
 
@@ -34,9 +37,8 @@ BOOL addBlurSwitch = NO;
 NSString* blurModeValue = @"2";
 NSString* blurAmountValue = @"1.0";
 
-// gestures
-BOOL leftSwipeSwitch = YES;
-BOOL rightSwipeSwitch = YES;
+// double tap
+BOOL doubleTapSwitch = NO;
 
 // hide by default
 BOOL hideOnWakeSwitch = NO;
@@ -59,7 +61,7 @@ BOOL showDeviceNameSwitch = YES;
 
 @interface CSCoverSheetViewController : UIViewController
 @property (assign,getter=isAuthenticated,nonatomic) BOOL authenticated; 
-@property (nonatomic,readonly) CSCoverSheetView * coverSheetView; 
+@property (nonatomic,readonly) CSCoverSheetView* coverSheetView; 
 - (void)setAuthenticated:(BOOL)authenticated;
 @end
 
@@ -101,4 +103,9 @@ BOOL showDeviceNameSwitch = YES;
 - (BOOL)isPaused;
 - (BOOL)changeTrack:(int)arg1 eventSource:(long long)arg2;
 - (BOOL)togglePlayPauseForEventSource:(long long)arg1;
+@end
+
+@interface NCNotificationListView : UIScrollView
+@property(nonatomic, getter=isRevealed) _Bool revealed;
+- (void)handleTap;
 @end
