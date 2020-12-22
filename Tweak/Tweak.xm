@@ -284,13 +284,12 @@ MediaControlsTimeControl* timeSlider;
 
 	instance.delaysContentTouches = NO;
 
-	tap = [[UITapGestureRecognizer alloc] initWithTarget:instance action:@selector(handleTap:)];
+	tap = [[UITapGestureRecognizer alloc] initWithTarget:instance action:@selector(handleTap)];
 	[tap setName:@"juinGestureTap"];
 
-	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:instance action:@selector(handleTap:)];
+	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:instance action:@selector(handleTap)];
 	[doubleTap setNumberOfTapsRequired:2];
 	[doubleTap setName:@"juinGestureDoubleTap"];
-	[tap requireGestureRecognizerToFail:doubleTap];
 	
 	[tap setDelegate:(id<UIGestureRecognizerDelegate>)instance];
 	[doubleTap setDelegate:(id<UIGestureRecognizerDelegate>)instance];
@@ -305,6 +304,14 @@ MediaControlsTimeControl* timeSlider;
 	return YES;
 }
 
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+	if ([[gestureRecognizer name] isEqualToString:@"juinGestureTap"] || [[gestureRecognizer name] isEqualToString:@"juinGestureDoubleTap"]) {
+		return (([[gestureRecognizer name] isEqualToString:@"juinGestureTap"] && !doubleTapSwitch) || ([[gestureRecognizer name] isEqualToString:@"juinGestureDoubleTap"] && doubleTapSwitch));
+	}
+	
+	return %orig;
+}
+
 - (void)setRevealed:(_Bool)revealed {
 	%orig;
 
@@ -315,9 +322,7 @@ MediaControlsTimeControl* timeSlider;
 }
 
 %new
-- (void)handleTap:(UITapGestureRecognizer *)sender {
-
-	if (([[sender name] isEqualToString:@"juinGestureTap"] && doubleTapSwitch) || ([[sender name] isEqualToString:@"juinGestureDoubleTap"] && !doubleTapSwitch)) return;
+- (void)handleTap {
 
 	if ([juinView isHidden]) {
 		hideDueToTap = NO;
