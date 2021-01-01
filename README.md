@@ -1,7 +1,7 @@
 # Juin
 Spotify inspired lockscreen player
 
-This fork is based off Litteeen's Juin 1.0
+This fork is based off Litteeen's Juin 1.0.1
 
 ## Changes
 \+ Option to Double Tap to Show/Hide 

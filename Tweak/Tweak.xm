@@ -184,7 +184,7 @@ MediaControlsTimeControl* timeSlider;
 
 
 	// artist label
-	if (!artistLabel) artistLabel = [[UILabel alloc] init];
+	if (!artistLabel) artistLabel = [[MarqueeLabel alloc] init];
 	[artistLabel setText:@""];
 	[artistLabel setTextColor:[UIColor colorWithRed: 0.60 green: 0.60 blue: 0.60 alpha: 1.00]];
 	[artistLabel setFont:[UIFont fontWithName:@"CircularSpUI-Bold" size:22]];
@@ -245,11 +245,6 @@ MediaControlsTimeControl* timeSlider;
 - (void)pausePlaySong { // pause/play song
 
 	[[%c(SBMediaController) sharedInstance] togglePlayPauseForEventSource:0];
-	
-	if ([[%c(SBMediaController) sharedInstance] isPlaying])
-		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/playing.png"] forState:UIControlStateNormal];
-	else
-		[playPauseButton setImage:[UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/JuinPrefs.bundle/paused.png"] forState:UIControlStateNormal];
 
 }
 
